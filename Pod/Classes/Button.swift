@@ -17,9 +17,9 @@ public class Button: UIButton {
     ///Default animation initial spring velocity
     static var springVelocity: CGFloat = 1.0
     ///Default animation duration
-    static var duration: NSTimeInterval = 0.5
+    static var duration: TimeInterval = 0.5
     ///Default bar color
-    static var color: UIColor = UIColor.blackColor()
+    static var color: UIColor = UIColor.black
     
     //MARK: Settings
     ///Line thickness of bars. Cannot be changed once initialized
@@ -32,7 +32,7 @@ public class Button: UIButton {
     ///Animation initial spring velocity.
     public var springVelocity: CGFloat = Button.springVelocity
     ///Animation duration.
-    public var duration: NSTimeInterval = Button.duration
+    public var duration: TimeInterval = Button.duration
     ///Bar color.
     public var color: UIColor = Button.color {
         didSet {
@@ -61,16 +61,16 @@ public class Button: UIButton {
         self.isX = !self.isX
         
         if self.isX {
-            self.transitionToX(animated)
+            self.transitionToX(animated: animated)
         } else {
-            self.transitionToHamburger(animated)
+            self.transitionToHamburger(animated: animated)
         }
     }
     
     ///Turns the HamburgerButton to the 'X' state. Animation is optional.
     public func transitionToX(animated: Bool) {
         if animated {
-            UIView.animateWithDuration(self.duration, delay: 0, usingSpringWithDamping: self.springDamping, initialSpringVelocity: self.springVelocity, options: [], animations: {
+            UIView.animate(withDuration: self.duration, delay: 0, usingSpringWithDamping: self.springDamping, initialSpringVelocity: self.springVelocity, options: [], animations: {
                 self.transformToX()
                 }, completion: nil)
         } else {
@@ -81,7 +81,7 @@ public class Button: UIButton {
     ///Turns the HamburgerButton to the 'Hamburger' state. Animation is optional.
     public func transitionToHamburger(animated: Bool) {
         if animated {
-            UIView.animateWithDuration(self.duration, delay: 0, usingSpringWithDamping: self.springDamping, initialSpringVelocity: self.springVelocity, options: [], animations: {
+            UIView.animate(withDuration: self.duration, delay: 0, usingSpringWithDamping: self.springDamping, initialSpringVelocity: self.springVelocity, options: [], animations: {
                 self.transformToHamburger()
                 }, completion: nil)
         } else {
@@ -91,20 +91,18 @@ public class Button: UIButton {
     
     //MARK: Transforms
     func transformToX() {
-        self.barTop.transform = CGAffineTransformConcat(
-            CGAffineTransformMakeRotation(CGFloat(M_PI_4)),
-            CGAffineTransformMakeTranslation(0, self.size / 2 - self.lineWidth / 2)
+        self.barTop.transform = CGAffineTransform(rotationAngle: CGFloat(Double.pi / 4)).concatenating(
+            CGAffineTransform(translationX: 0, y: self.size / 2 - self.lineWidth / 2)
         )
         
-        self.barBottom.transform = CGAffineTransformConcat(
-            CGAffineTransformMakeRotation(-1.0 * CGFloat(M_PI_4)),
-            CGAffineTransformMakeTranslation(0, -1.0 * (self.size / 2 - self.lineWidth / 2))
+        self.barBottom.transform = CGAffineTransform(rotationAngle: -1.0 * CGFloat(Double.pi / 4)).concatenating(
+            CGAffineTransform(translationX: 0, y: -1.0 * (self.size / 2 - self.lineWidth / 2))
         )
     }
     
     func transformToHamburger() {
-        self.barTop.transform = CGAffineTransformMakeTranslation(0, 2)
-        self.barBottom.transform = CGAffineTransformMakeTranslation(0, -2)
+        self.barTop.transform = CGAffineTransform(translationX: 0, y: 2)
+        self.barBottom.transform = CGAffineTransform(translationX: 0, y: -2)
     }
     
     //MARK: Setup
@@ -112,39 +110,39 @@ public class Button: UIButton {
         self.stage = UIView()
         
         //prevent from blocking touches
-        self.stage.userInteractionEnabled = false
+        self.stage.isUserInteractionEnabled = false
         
         //attach to button
         self.stage.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(self.stage)
         
         self.stage.addConstraint(
-            NSLayoutConstraint(item: self.stage, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .Height, multiplier: 1, constant: self.size)
+            NSLayoutConstraint(item: self.stage, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .height, multiplier: 1, constant: self.size)
         )
         self.stage.addConstraint(
-            NSLayoutConstraint(item: self.stage, attribute: .Width, relatedBy: .Equal, toItem: nil, attribute: .Width, multiplier: 1, constant: self.size)
+            NSLayoutConstraint(item: self.stage, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .width, multiplier: 1, constant: self.size)
         )
         self.addConstraint(
-            NSLayoutConstraint(item: self.stage, attribute: .CenterX, relatedBy: .Equal, toItem: self, attribute: .CenterX, multiplier: 1, constant: 0)
+            NSLayoutConstraint(item: self.stage, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 0)
         )
         self.addConstraint(
-            NSLayoutConstraint(item: self.stage, attribute: .CenterY, relatedBy: .Equal, toItem: self, attribute: .CenterY, multiplier: 1, constant: 0)
+            NSLayoutConstraint(item: self.stage, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1, constant: 0)
         )
         
         //DEBUG
         //self.stage.layer.borderWidth = 1
         //self.stage.layer.borderColor = UIColor.redColor().CGColor
         
-        self.addTarget(self, action: Selector("touchUpInside:"), forControlEvents: .TouchUpInside)
+        self.addTarget(self, action: Selector("touchUpInside:"), for: .touchUpInside)
         
         
         self.barTop = UIView()
-        self.barTop.backgroundColor = UIColor.blackColor()
-        self.attachBar(self.barTop, side: .Top)
+        self.barTop.backgroundColor = UIColor.black
+        self.attachBar(bar: self.barTop, side: .top)
         
         self.barBottom = UIView()
-        self.barBottom.backgroundColor = UIColor.blackColor()
-        self.attachBar(self.barBottom, side: .Bottom)
+        self.barBottom.backgroundColor = UIColor.black
+        self.attachBar(bar: self.barBottom, side: .bottom)
         
         self.transformToHamburger()
     }
@@ -154,24 +152,24 @@ public class Button: UIButton {
         bar.translatesAutoresizingMaskIntoConstraints = false
         
         self.stage.addConstraint(
-            NSLayoutConstraint(item: self.stage, attribute: side, relatedBy: .Equal, toItem: bar, attribute: side, multiplier: 1, constant: 0)
+            NSLayoutConstraint(item: self.stage, attribute: side, relatedBy: .equal, toItem: bar, attribute: side, multiplier: 1, constant: 0)
         )
         self.stage.addConstraint(
-            NSLayoutConstraint(item: self.stage, attribute: .Left, relatedBy: .Equal, toItem: bar, attribute: .Left, multiplier: 1, constant: 0)
+            NSLayoutConstraint(item: self.stage, attribute: .left, relatedBy: .equal, toItem: bar, attribute: .left, multiplier: 1, constant: 0)
         )
         self.stage.addConstraint(
-            NSLayoutConstraint(item: self.stage, attribute: .Right, relatedBy: .Equal, toItem: bar, attribute: .Right, multiplier: 1, constant: 0)
+            NSLayoutConstraint(item: self.stage, attribute: .right, relatedBy: .equal, toItem: bar, attribute: .right, multiplier: 1, constant: 0)
         )
         
         
         bar.addConstraint(
-            NSLayoutConstraint(item: bar, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .Height, multiplier: 1, constant: self.lineWidth)
+            NSLayoutConstraint(item: bar, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .height, multiplier: 1, constant: self.lineWidth)
         )
     }
     
     //MARK: Touch
     func touchUpInside(sender: Button) {
-        self.delegate?.hamburgerButtonPressed(self)
+        self.delegate?.hamburgerButtonPressed(button: self)
     }
     
     //MARK: Init
