@@ -133,7 +133,7 @@ public class Button: UIButton {
         //self.stage.layer.borderWidth = 1
         //self.stage.layer.borderColor = UIColor.redColor().CGColor
         
-        self.addTarget(self, action: Selector("touchUpInside:"), for: .touchUpInside)
+        self.addTarget(self, action: #selector(Button.touchUpInside), for: .touchUpInside)
         
         
         self.barTop = UIView()
@@ -168,7 +168,7 @@ public class Button: UIButton {
     }
     
     //MARK: Touch
-    func touchUpInside(sender: Button) {
+    @objc func touchUpInside(sender: Button) {
         self.delegate?.hamburgerButtonPressed(button: self)
     }
     
